@@ -7,9 +7,24 @@
       $npu=$_POST['prixUnitaire'];
       $ndateAchat=$_POST['dateAchat'];
       $ncategorie=$_POST['categorie'];
-      
-    $con->exec("UPDATE `produit` SET `libelle`='$nlibelle', `prixUnitaire`='$npu', `dateAchat`='$ndateAchat', `idCategorie`='$ncategorie' where `reference`='$ref'");
+      if(!isset($_FILES["file"]["name"])){
+        $con->exec("UPDATE `produit` SET `libelle`='$nlibelle', `prixUnitaire`='$npu', `dateAchat`='$ndateAchat', `idCategorie`='$ncategorie' where `reference`='$ref'");
+        echo "<script>location.assign('accueil.php')</script>";
+      }
+      else{
+        unlink("slider/" . $image);
+        $filename = $_FILES["file"]["name"];
+      $filename = str_replace("'", "_", $filename);
+      $tempname = $_FILES["file"]["tmp_name"];
+      $folder = "images/" . $filename;
+      if (move_uploaded_file($tempname, $folder)) {
+        echo "<h3>  Image uploaded successfully!</h3>";
+      } else {
+          echo "<script>  alert('Failed to upload image!')</script>";
+      }
+      $con->exec("UPDATE `produit` SET `libelle`='$nlibelle', `prixUnitaire`='$npu', `dateAchat`='$ndateAchat', `idCategorie`='$ncategorie',`photoProduit`='$filename' where `reference`='$ref'");
     echo "<script>location.assign('accueil.php')</script>";
+      }
     }
     ?>
 <!DOCTYPE html>
@@ -51,6 +66,7 @@ $result = $con->query("select * from produit where reference='$ref'");
        $pu=$row['prixUnitaire'];
        $dateAchat=$row['dateAchat'];
        $categorie=$row['idCategorie'];
+       $image=$row['photoProduit'];
     }
 ?>
 <h2 class="text-center">Modifier le produit</h2>
@@ -73,6 +89,13 @@ $result = $con->query("select * from produit where reference='$ref'");
     		<input type="date" class="form-control" id="staticEmail" name="dateAchat" value="<?php echo $dateAchat ?>">
   		</div>
 	</div>
+  <div class="form-group row" style="margin-top:2%">
+        <label for="" class="col-sm-2 col-form-label"> Modifier l'image</label>
+        <img style="width:200px;height:200px"src="images/<?php echo $image;?>">
+        <div class="col-sm-10">
+            <input type="file" name="file" class="form-control" id="staticEmail">
+        </div>
+    </div>
     <div class="form-group row" style="margin-top:2%">
         <label for="" class="col-sm-2 col-form-label">Categorie</label>
         <div class="col-sm-10">
@@ -90,7 +113,7 @@ $result = $con->query("select * from produit where reference='$ref'");
     
         </select>
         </div>
-        </div>
+    </div>
         <input type="submit" value="submit" class="btn btn-primary" style="margin-top:2%; width:30%;">
 	</form>
 </body>

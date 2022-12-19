@@ -12,6 +12,9 @@
 <body>
     <?php 
     include('connexion.php');
+    // if (!isset($_SESSION['loginProp'])){
+    //   echo "<script>location.assign('login.php')</script>";
+    // }
     session_start()
 
     ?>
